@@ -15,11 +15,13 @@ const internSchema = new mongoose.Schema({
 
     },
     mobile: {
+        required:true,
         type: Number,
         unique: true
 
     },
     collegeId: {
+        required:true,
         type: mongoose.Schema.Types.ObjectId,
         ref: "mycollege"
 
