@@ -15,15 +15,16 @@ const createCollege = async function (req, res) {
     try {
         let data = req.body;
         const validlogolink = /(http|https(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png|jpeg)/
-        .test(data.logoLink)
+            .test(data.logoLink)
 
 
 
-
-       
         if (!isValid(data.name)) return res.status(400).send({ status: false, message: "name is required" })
+
         if (!data.name) return res.status(400).send({ status: false, message: "name is required" });
+
         const validateName = await CollegeModel.findOne({ name: data.name })
+
         if (validateName) return res.status(400).send({ status: false, message: "name must be unique" })
 
 
@@ -31,9 +32,11 @@ const createCollege = async function (req, res) {
         if (!data.fullName) return res.status(400).send({ status: false, message: "fullname is required" });
 
         if (!data.logoLink) return res.status(400).send({ status: false, message: "logolink is required" });
+
         if (!validlogolink) return res.status(400).send({ status: false, message: "logolink is invalid" });
 
         const createCollegeData = await CollegeModel.create(data)
+
         res.status(201).send({ status: true, message: createCollegeData })
     } catch (err) {
         res.status(500).send({ status: false, error: err.message })
@@ -56,28 +59,31 @@ const createCollege = async function (req, res) {
 
 const getAllCollegessWithInterns = async function (req, res) {
     try {
-        let data = req.query;
-        let fullName = data.fullName;
-        let collegeName = data.name
-        const collegeData = await CollegeModel.findOne({name :collegeName, isDeleted : false})
-      if  (!collegeData) return res.status(404).send({status: false, message : "no college found"})
-        fullName = collegeData.fullName;
+        // let data = req.query;
+        // let fullName = data.fullName;
+        let collegeName = req.query.collegeName
+
+        const collegeData = await CollegeModel.findOne({ name: collegeName, isDeleted: false })
+
+        if (!collegeData) return res.status(404).send({ status: false, message: "no college found" })
+        // fullName = collegeData.fullName;
         const filterCollege = {
-            name :collegeData.name,
-            fullName:collegeData.fullName,
-            logoLink:collegeData.logoLink
+            name: collegeData.name,
+            fullName: collegeData.fullName,
+            logoLink: collegeData.logoLink
         }
+
         const collegeId = collegeData._id
-       const getInterns = await InternModel.find()
-       console.log(getInterns)
-      
-       if(getInterns.length!=0) {
-        filterCollege.intrest = getInterns
-        res.status(200).send({status : true , data: filterCollege})
-       }
-    //    console.log(getInterns)
-       if(getInterns.length == 0) return res.status(400).send({status : false ,message :"no interns found."})
-    }catch(err){
+        const getInterns = await InternModel.find({ collegeId: collegeId, isDeleted: false })
+        console.log(getInterns)
+
+        if (getInterns.length != 0) {
+            filterCollege.intrest = getInterns
+            res.status(200).send({ status: true, data: filterCollege })
+        }
+        //    console.log(getInterns)
+        if (getInterns.length == 0) return res.status(400).send({ status: false, message: "no interns found." })
+    } catch (err) {
         res.status(500).send({ status: false, error: err.message })
     }
 }
