@@ -15,6 +15,7 @@ const isValid = function (value) {
 const createInterns = async function (req, res) {
     try {
         let data = req.body;
+        const{name,email,mobile,collegeName}= data
 
         if (!isValid(data.name)) return res.status(400).send({ status: false, message: "name is required." })
 
